@@ -1,11 +1,6 @@
-module.exports = {
-    // Server configuration
-    PORT: process.env.PORT || 5000,
-    NODE_ENV: process.env.NODE_ENV || 'development',
+const path = require('path');
 
-    // Database configuration
-    DB_PATH: './data/blog_search.db',
-    
+const baseConfig = {
     // Crawler configuration
     CRAWLER: {
         CONCURRENT_CRAWLS: 5,
@@ -16,13 +11,8 @@ module.exports = {
 
     // Classification thresholds
     CLASSIFIER: {
-        // Confidence threshold for blog classification
         BLOG_CONFIDENCE_THRESHOLD: 0.7,
-        
-        // Minimum word count for a valid blog post
         MIN_WORD_COUNT: 500,
-        
-        // Maximum percentage of outbound links (to filter spam)
         MAX_LINK_PERCENTAGE: 0.1
     },
 
@@ -31,4 +21,35 @@ module.exports = {
         WINDOW_MS: 15 * 60 * 1000, // 15 minutes
         MAX_REQUESTS: 100
     }
+};
+
+const envConfig = {
+    development: {
+        PORT: process.env.PORT || 5000,
+        NODE_ENV: 'development',
+        DB_PATH: path.join(process.cwd(), 'data', 'blog_search.db'),
+        CORS: {
+            origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+            methods: ['GET', 'POST', 'OPTIONS'],
+            allowedHeaders: ['Content-Type', 'Authorization'],
+            credentials: true
+        }
+    },
+    production: {
+        PORT: process.env.PORT || 5000,
+        NODE_ENV: 'production',
+        DB_PATH: path.join(process.env.DATA_DIR || process.cwd(), 'data', 'blog_search.db'),
+        CORS: {
+            origin: process.env.FRONTEND_URL || '*',
+            methods: ['GET', 'POST', 'OPTIONS'],
+            allowedHeaders: ['Content-Type', 'Authorization'],
+            credentials: true
+        }
+    }
+};
+
+const env = process.env.NODE_ENV || 'development';
+module.exports = {
+    ...baseConfig,
+    ...envConfig[env]
 };
