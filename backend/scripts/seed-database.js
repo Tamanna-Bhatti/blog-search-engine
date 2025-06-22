@@ -1,56 +1,54 @@
-const fs = require('fs');
-const path = require('path');
-const crawler = require('../services/crawler');
-const { initializeDatabase } = require('../services/database');
+const { initializeDatabase, upsertPost } = require('../services/database');
+const config = require('../config/config');
+
+const samplePosts = [
+    {
+        title: "Getting Started with Web Development",
+        url: "https://example-blog.com/web-dev-intro",
+        snippet: "A comprehensive guide for beginners looking to start their journey in web development.",
+        domain: "example-blog.com",
+        content: "Web development is an exciting field that combines creativity with technical skills...",
+        is_blog: true,
+        quality_score: 0.85
+    },
+    {
+        title: "Modern JavaScript Features You Should Know",
+        url: "https://tech-blog.com/modern-js-features",
+        snippet: "Exploring the latest JavaScript features that make coding more efficient and enjoyable.",
+        domain: "tech-blog.com",
+        content: "JavaScript has evolved significantly over the years, introducing many powerful features...",
+        is_blog: true,
+        quality_score: 0.9
+    },
+    {
+        title: "Building Responsive Websites with Tailwind CSS",
+        url: "https://css-tricks.com/tailwind-guide",
+        snippet: "Learn how to create beautiful, responsive websites using Tailwind CSS utility classes.",
+        domain: "css-tricks.com",
+        content: "Tailwind CSS has revolutionized the way we style websites, offering a utility-first approach...",
+        is_blog: true,
+        quality_score: 0.88
+    }
+];
 
 async function seedDatabase() {
     try {
-        console.log('🌱 Starting database seeding...');
-        
-        // Initialize database
+        console.log('Initializing database...');
         await initializeDatabase();
-        
-        // Load seed URLs
-        const seedFile = path.join(__dirname, '../data/seed-urls.json');
-        const seedData = JSON.parse(fs.readFileSync(seedFile, 'utf8'));
-        
-        console.log(`📋 Found ${seedData.urls.length} URLs to crawl`);
-        
-        // Crawl URLs in batches to avoid overwhelming servers
-        const batchSize = 5;
-        for (let i = 0; i < seedData.urls.length; i += batchSize) {
-            const batch = seedData.urls.slice(i, i + batchSize);
-            console.log(`🔄 Processing batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(seedData.urls.length/batchSize)}`);
-            
-            await Promise.all(batch.map(async (url) => {
-                try {
-                    console.log(`  📡 Crawling: ${url}`);
-                    await crawler.crawlUrl(url);
-                } catch (error) {
-                    console.error(`  ❌ Failed to crawl ${url}:`, error.message);
-                }
-            }));
-            
-            // Wait between batches to be respectful
-            if (i + batchSize < seedData.urls.length) {
-                console.log('  ⏳ Waiting 2 seconds before next batch...');
-                await new Promise(resolve => setTimeout(resolve, 2000));
-            }
+
+        console.log('Seeding sample blog posts...');
+        for (const post of samplePosts) {
+            await upsertPost(post);
+            console.log(`Seeded: ${post.title}`);
         }
-        
-        console.log('✅ Database seeding completed!');
-        
-    } catch (error) {
-        console.error('❌ Error seeding database:', error);
-    } finally {
-        await crawler.close();
+
+        console.log('Database seeding completed successfully!');
         process.exit(0);
+    } catch (error) {
+        console.error('Error seeding database:', error);
+        process.exit(1);
     }
 }
 
-// Run if called directly
-if (require.main === module) {
-    seedDatabase();
-}
-
-module.exports = { seedDatabase };
+// Run seeding
+seedDatabase();
