@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: blog-search-engine-backend
+    env: node
+    buildCommand: npm install --production
+    startCommand: NODE_ENV=production node scripts/start-prod.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: FRONTEND_URL
+        sync: false # This will be set manually in Render dashboard
+    healthCheckPath: /health
+    autoDeploy: true
+    disk:
+      name: blog-search-data
+      mountPath: /data
+      sizeGB: 1
