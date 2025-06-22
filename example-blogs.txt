@@ -1,0 +1,5 @@
+https://martinfowler.com/articles/practical-test-pyramid.html
+https://blog.pragmaticengineer.com/software-engineering-salaries-in-the-netherlands-and-europe/
+https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/
+https://davidwalsh.name/javascript-objects
+https://dev.to/lydiahallie/javascript-visualized-prototypal-inheritance-47co
