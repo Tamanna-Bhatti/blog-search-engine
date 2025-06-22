@@ -1,0 +1,25 @@
+{
+  "name": "blog-search-engine-backend",
+  "version": "1.0.0",
+  "description": "A search engine for tech blogs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "start:prod": "NODE_ENV=production node scripts/start-prod.js",
+    "build": "npm install --production",
+    "seed": "node scripts/seed-database.js"
+  },
+  "dependencies": {
+    "compression": "^1.8.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.5.0",
+    "morgan": "^1.10.0",
+    "puppeteer": "^22.0.0",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
