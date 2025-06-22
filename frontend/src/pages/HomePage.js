@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import SearchBar from '../components/SearchBar';
 import SearchResults from '../components/SearchResults';
+import { handleApiError, safeJsonParse } from '../utils/errorHandler';
 
 function HomePage() {
   const [searchResults, setSearchResults] = useState(null);
@@ -12,21 +13,31 @@ function HomePage() {
     setError(null);
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_BASE_BACKEND_URL}/search?q=${encodeURIComponent(query)}`);
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/search?q=${encodeURIComponent(query)}`,
+        {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+        }
+      );
       
       if (!response.ok) {
-        throw new Error('Failed to fetch search results');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await safeJsonParse(response);
       
-      if (data.status === 'success') {
+      if (data.status === 'success' && Array.isArray(data.data?.results)) {
         setSearchResults(data.data.results);
       } else {
-        throw new Error(data.message || 'Something went wrong');
+        throw new Error(data.message || 'Invalid response format');
       }
     } catch (err) {
-      setError(err.message);
+      const errorMessage = handleApiError(err);
+      setError(errorMessage);
       setSearchResults(null);
     } finally {
       setIsLoading(false);
@@ -34,9 +45,9 @@ function HomePage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Hero Section */}
-      <div className="text-center mb-12">
+      <div className="text-center mb-12 pt-8 sm:pt-12">
         <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
           Find Authentic Blog Content
         </h1>
@@ -69,7 +80,7 @@ function HomePage() {
           {/* Feature 1 */}
           <div className="text-center px-6">
             <div className="w-12 h-12 mx-auto mb-4 flex items-center justify-center 
-                          bg-black rounded-lg">
+                          bg-black rounded-lg transform transition-transform duration-300 hover:scale-110">
               <svg
                 className="w-6 h-6 text-white"
                 fill="none"
@@ -93,7 +104,7 @@ function HomePage() {
           {/* Feature 2 */}
           <div className="text-center px-6">
             <div className="w-12 h-12 mx-auto mb-4 flex items-center justify-center 
-                          bg-black rounded-lg">
+                          bg-black rounded-lg transform transition-transform duration-300 hover:scale-110">
               <svg
                 className="w-6 h-6 text-white"
                 fill="none"
@@ -117,7 +128,7 @@ function HomePage() {
           {/* Feature 3 */}
           <div className="text-center px-6">
             <div className="w-12 h-12 mx-auto mb-4 flex items-center justify-center 
-                          bg-black rounded-lg">
+                          bg-black rounded-lg transform transition-transform duration-300 hover:scale-110">
               <svg
                 className="w-6 h-6 text-white"
                 fill="none"
