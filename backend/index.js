@@ -13,9 +13,22 @@ const config = require('./config/config');
 const app = express();
 
 // Middleware
-app.use(cors());
-app.use(express.json());
-app.use(morgan('dev'));
+app.use(cors(config.CORS));
+app.use(compression());
+// Body parser with increased limit for larger payloads
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Logging
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+
+// Basic security headers
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    next();
+});
 
 // Ensure data directory exists
 const fs = require('fs');
