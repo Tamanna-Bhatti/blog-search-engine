@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const compression = require('compression');
 const path = require('path');
 const { initializeDatabase } = require('./services/database');
 const searchRoutes = require('./routes/searchRoutes');
